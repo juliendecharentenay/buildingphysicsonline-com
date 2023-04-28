@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>Building Physics Online</title>
+    
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <!--  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">  -->
+    <link rel="stylesheet" href="/vue-material/vue-material.min.css">
+    <link rel="stylesheet" href="/vue-material/theme/default.css">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+
+  <body>
+      <div class="page-container" id="benchmarking-app">
+	    <md-app md-waterfall md-mode="fixed">
+    	  <md-app-toolbar class="md-primary">
+        	<div class="md-toolbar-row">
+        	  	<span class="md-title">CIBSE TM46 Energy Benchmarking</span>
+ 	       	</div>
+      	  </md-app-toolbar>
+      	  
+          <md-app-content>
+            <div class="md-layout md-gutter md-alignment-top-center">
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <p>This calculator is based on the CIBSE TM46 Energy Benchmarking publication. It provides
+                   a simple way to estimate a benchmark energy (electricity and natural gas) consumption
+                   for a number of building type.<br/>
+                   No affiliation with CIBSE or endorsement by CIBSE is claimed. 
+                   This calculator is provided as-is with no warranty.<br/>
+                   If you notice a mistake or issue with the calculator, 
+                   please contact <a href="mailto:julien.decharentenay@gmail.com">me</a>.
+                </p>
+              </div>
+                            
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <md-steppers>
+                  <md-step id="first" md-label="Type">
+                    <md-field>
+                      <label for="category">Category</label>
+                      <md-select v-model="category_id" name="category" id="category">
+                        <md-option 
+                          v-for="c in getCategories()"
+                          v-bind:key="c.key"
+                          v-bind:value="c.id">{{c.name}}</md-option>
+                      </md-select>
+                    </md-field>
+              
+                    <p v-if="category != null">
+                      <span v-if="category.description != null"><strong>Brief description:</strong> {{ category.description }}<br/></span>
+                      <span v-if="category.usage != null"><strong>Space usage:</strong> {{ category.usage }}<br/></span>
+                      <span v-if="category.schedule != null"><strong>Operational schedule:</strong> {{ category.schedule }}<br/></span>
+                      <span v-if="category.features != null"><strong>Distinguishing features:</strong> {{ category.features }}<br/></span>
+                      <span v-if="category.services != null"><strong>Services included:</strong> {{ category.services }}<br/></span>
+                      <span v-if="category.mixeduse != null"><strong>May be part of mixed use with following area:</strong> {{ category.mixeduse }}<br/></span>
+                      <span v-if="category.specialenergy != null"><strong>Allowable special energy uses:</strong> {{ category.specialenergy }}<br/></span>
+                      <span v-if="category.representative != null"><strong>Representative building:</strong> {{ category.representative }}</span>
+        	        </p>
+                  </md-step>
+
+                  <md-step id="second" md-label="Characteristics">
+                    <div class="md-layout md-gutter md-alignment-top-center" v-if="category != null">
+                      <div class="md-layout-item md-size-80">
+                        <md-button 
+                           v-for="m in getMetrics()"
+                           v-bind:key="m.id"
+                           v-bind:class="{'md-primary': ! isMetric(m.id), 'md-accent': isMetric(m.id)}"
+                           v-on:click="setMetric(m.id)">
+                           {{ m.shortname }}
+                        </md-button>
+                      </div>
+              
+                      <div class="md-layout-item md-size-75 md-small-size-100" v-if="getMetricFull() != null">
+                        <md-field>
+    	                  <label>{{ getMetricFull().name }}</label>
+        	              <md-input type="number" step="any" min="0" v-model="metricvalue"></md-input>
+        	              <span class="md-suffix">{{ getMetricFull().unit }} </span>
+            	        </md-field>
+            	      </div>
+            	      
+            	      <div class="md-layout-item md-size-75 md-small-size-100">
+            	        <md-field>
+            	          <label for="location">Select UK location (or Reference if no weather adjustment required)</label>
+            	          <md-select v-model="location" name="location" id="location">
+            	            <md-option
+            	              v-for="l in getLocations()"
+            	              v-bind:key="l.key"
+            	              v-bind:value="l.id">{{ l.name }}
+            	            </md-option>
+            	          </md-select>
+            	        </md-field>
+            	      </div>
+            	      
+            	      <div class="md-layout-item md-size-75 md-small-size-100" v-if="getOccupancy() != null">
+            	        <md-field>
+            	          <label>Occupancy hours adjustment [{{ getOccupancy().reference }} 
+            	                to {{ getOccupancy().maximum }} hours]</label>
+            	          <md-tooltip md-direction="bottom">{{ getOccupancy().definition }}</md-tooltip>
+        	              <md-input type="number" 
+        	              	step="any" 
+        	              	v-bind:min="getOccupancy().reference" 
+        	              	v-bind:max="getOccupancy().maximum" 
+        	              	v-model="hours"></md-input>
+        	              <span class="md-suffix">h</span>
+            	        </md-field>
+            	      </div>
+            	    </div>
+            	  </md-step>
+            	  
+            	  
+            	  <md-step id="third" md-label="Benchmarks">
+            	    <span v-if="getMetricFull() != null">
+            	      <div class="md-layout md-gutter">
+              	        <div class="md-layout-item md-size-45">
+            	          <h5>Energy benchmark</h5>            	      
+            	          <div
+              	            v-for="e in getEnergy()"
+            	            v-bind:key="e.id">
+            	            <strong>{{ e.name }}</strong>: {{ toLocalString(getValue(e)) }}{{ e.unit }} <i>[uncorrected: {{ toLocalString(e.value(metric_value_primary)) }}{{e.unit}}]</i>
+              	          </div>
+            	        </div>
+            	        
+            	        <div class="md-layout-item md-size-45">
+            	          <h5>Summary</h5>
+            	          <div class="">{{ getMetricFull().shortname }}: {{ metricvalue }}{{ getMetricFull().unit }}
+            	          </div>
+            	          <div class="" v-if="location != 'Reference'">Weather correction for location: {{ location }}</div>
+            	          <div class="" v-if="getOccupancy() != null">Occupancy correction based on: {{ getHours() }} hours of occupancy</div>
+              	        </div>
+            	      </div>
+            	    </span>
+            	  </md-step>
+            	</md-steppers>
+              </div>
+            </div>
+            
+            <md-divider></md-divider>
+            <div class="footer">
+            Benchmarking values based on <a href="https://www.cibse.org/Knowledge/knowledge-items/detail?id=a0q20000008I7evAAC" target="_blank">CIBSE TM46</a><br/>
+            <a href="/index.html">Building Physics Online</a>
+            Copyright (C) 2019, Dr Julien de Charentenay</div>
+          </md-app-content>
+        </md-app>
+        
+    </div>
+
+    <script src="/vue/vue.js"></script>
+    <script src="/vue-material/vue-material.js"></script>
+
+    <script src="/benchmarkingJS/cibsetm46.js"></script>
+    <script>
+      Vue.use(VueMaterial.default)
+    </script>
+    <script src="/js/vm-benchmarking.js"></script>
+  
+  </body>
+</html>

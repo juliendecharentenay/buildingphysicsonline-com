@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>Building Physics Online</title>
+    
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <!--  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">  -->
+    <link rel="stylesheet" href="/vue-material/vue-material.min.css">
+    <link rel="stylesheet" href="/vue-material/theme/default.css">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+
+  <body>
+      <div class="page-container" id="psychrometric-calculator-app">
+	    <md-app md-waterfall md-mode="fixed">
+    	  <md-app-toolbar class="md-primary">
+        	<div class="md-toolbar-row">
+        	  	<span class="md-title">Psychrometric Calculator</span>
+ 	       	</div>
+      	  </md-app-toolbar>
+      	  
+          <md-app-content>
+
+            <div class="md-layout md-gutter md-alignment-top-center">
+              <div class="md-layout-item md-size-85 md-small-size-100">
+      	        <md-button v-bind:class="{'md-primary': ! useAltitude(), 'md-accent': useAltitude()}" v-on:click="setAltitudeOption()">Altitude</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! usePressure(), 'md-accent': usePressure()}" v-on:click="setPressureOption()">Pressure</md-button>
+      	      </div>
+
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-size-50">
+	                <md-field>
+    	              <label>Altitude (m)</label>
+        	          <md-input type="number" v-model="altitude" :disabled="! useAltitude()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">
+                    <md-field>
+                      <label>Reference pressure (Pa)</label>
+                      <md-input type="number" v-model="referencePressure" :disabled="! usePressure()"></md-input>
+                    </md-field>
+                  </div>
+                </div>
+              </div>
+
+              <md-divider></md-divider>
+              <div class="md-layout-item md-size-85 md-small-size-100">
+      	        <md-button v-bind:class="{'md-primary': ! useDryBulbTemperature(), 'md-accent': useDryBulbTemperature()}" v-on:click="toggleDryBulbTemperature()">DBT</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! useWetBulbTemperature(), 'md-accent': useWetBulbTemperature()}" v-on:click="toggleWetBulbTemperature()">WBT</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! useDewPointTemperature(), 'md-accent': useDewPointTemperature()}" v-on:click="toggleDewPointTemperature()">DPT</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! useRelativeHumidity(), 'md-accent': useRelativeHumidity()}" v-on:click="toggleRelativeHumidity()">RH</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! useHumidityRatio(), 'md-accent': useHumidityRatio()}" v-on:click="toggleHumidityRatio()">HR</md-button>
+      	        <md-button v-bind:class="{'md-primary': ! useEnthalpy(), 'md-accent': useEnthalpy()}" v-on:click="toggleEnthalpy()">H</md-button>
+      	      </div>
+
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-size-50">
+	                <md-field>
+    	              <label>Dry-bulb temperature (&deg;C)</label>
+        	          <md-input type="number" v-model="dryBulbTemperature" :disabled="! useDryBulbTemperature()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">
+	                <md-field>
+    	              <label>Wet-bulb temperature (&deg;C)</label>
+        	          <md-input type="number" v-model="wetBulbTemperature" :disabled="! useWetBulbTemperature()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Dew point temperature (&deg;C)</label>
+        	          <md-input type="number" v-model="dewPointTemperature" :disabled="! useDewPointTemperature()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Relative humidity (%)</label>
+        	          <md-input type="number" v-model="relativeHumidity" :disabled="! useRelativeHumidity()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Humidity ratio (kg/kg dry-air)</label>
+        	          <md-input type="number" v-model="humidityRatio" :disabled="! useHumidityRatio()"></md-input>
+            	    </md-field>
+            	  </div>
+                
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Enthalpy (kJ/kg dry-air)</label>
+        	          <md-input type="number" v-model="enthalpy" :disabled="! useEnthalpy()"></md-input>
+            	    </md-field>
+	              </div>
+
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Dry air density (kg/m3)</label>
+        	          <md-input type="number" v-model="dryAirDensity" disabled></md-input>
+            	    </md-field>
+	              </div>
+
+                  <div class="md-layout-item md-size-50">                
+	                <md-field>
+    	              <label>Density (kg/m3)</label>
+        	          <md-input type="number" v-model="density" disabled></md-input>
+            	    </md-field>
+	              </div>
+                </div>
+              </div>
+            </div>
+            
+            <md-divider></md-divider>
+
+            <md-divider></md-divider>
+            <div class="footer">
+            Powered by <a href="https://github.com/juliendecharentenay/PsychrometricsJS" target="_blank">psychrometricsJS</a><br/>
+            <a href="/index.html">Building Physics Online</a>
+            Copyright (C) 2019, Dr Julien de Charentenay</div>
+          </md-app-content>
+        </md-app>
+        
+    </div>
+
+    <script src="/vue/vue.js"></script>
+    <script src="/vue-material/vue-material.js"></script>
+
+    <script src="/psychrometricsJS/psychrometricsJS.js"></script>
+    <script>
+      Vue.use(VueMaterial.default)
+    </script>
+    <script src="/js/vm-psychrometriccalculator.js"></script>
+  
+  </body>
+</html>

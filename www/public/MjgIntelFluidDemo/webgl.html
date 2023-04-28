@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+
+<!-- SEO Start -->
+    <meta name="description" content="Building physics online resource collection and apps. Useful to building simulation and sustainability practitioners."/>
+    <link rel="canonical" href="https://www.buildingphysicsonline.com/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Building Physics Online" />
+    <meta property="og:description" content="Building physics online resource collection and apps. Useful to building simulation and sustainability practitioners." />
+    <meta property="og:url" content="https://www.buildingphysicsonline.com/" />
+    <meta property="og:site_name" content="Building Physics Online" />
+<!-- SEO End -->
+
+
+
+    <title>WebAssembly porting of Fluid Simulation for Video Game, Part 3 [Dr M.J Gourlay]</title>
+    
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="/vue-material/vue-material.min.css">
+    <link rel="stylesheet" href="/vue-material/theme/default.css">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  
+  
+  <body>
+    <script src="js/vorteGrid.js"></script>
+    
+    
+    <div class="page-container" id="index-app">
+	  <md-app md-waterfall md-mode="fixed">
+        <md-app-toolbar class="md-primary" id="app-toolbar">
+          <div v-if="section == INTRO">
+            <div class="md-toolbar-row">
+        	  <span class="md-title">WebAssembly port of
+        	  	 Fluid Simulation for Video Game (part 3) [Dr M.J Gourlay]</span>
+        	 </div>
+ 	      </div>
+          <div v-if="section == PLAY">
+            <div class="md-toolbar-row">
+              <md-button class="md-icon-button" v-on:click="toIntro">
+                <md-icon>keyboard_arrow_left</md-icon>
+              </md-button>
+              <md-field>
+                <label for="simOption">Scenarios</label>
+                <md-select v-model="simOption" name="simOption" id="simOption">
+                  <md-option value="0">Vortex ring</md-option>
+                  <md-option value="1">Jet vortex ring</md-option>
+                  <md-option value="2">Projectile</md-option>
+                  <md-option value="3">Spinning sphere</md-option>
+                  <md-option value="4">Vortex sheet with spanwise variation</md-option>
+                  <md-option value="5">Vortex tube</md-option>
+                  <md-option value="6">Orthogonal vortex tubes</md-option>
+                  <md-option value="7">2D sheet</md-option>
+                </md-select>
+              </md-field>
+              <md-button class="md-icon-button" v-on:click="toggleSim">
+                <md-icon>{{ isSimRunning ? "pause_circle_outline" : "play_circle_outline" }}</md-icon>
+              </md-button>
+              <md-button class="md-icon-button" v-on:click="restartSim">
+                <md-icon>settings_backup_restore</md-icon>
+              </md-button>
+              time: {{ mSimTime.toFixed(2) }}s
+            </div>
+          </div>
+      	</md-app-toolbar>
+
+      	  
+        <md-app-content id="app-content">
+          <div v-show="section == INTRO">
+            <div class="md-layout md-gutter md-alignment-top-center">
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <p>This web page shows a port of the fluid simulation engine for video game developed by Dr Michael J Gourlay
+                 to WebAssembly. This exercise was primarily the opportunity for myself to get familiar with WebAssembly
+                 whilst doing something I enjoy... fluid dynamics...
+                 </p>
+                 <p>
+                 The porting of the solver itself was straightforward. The porting of the rendering was not... The rendering 
+                 has been rewritten to openGL ES/WebGL. Unfortunately, rendering is not my speciality and the result falls short of the 
+                 original, but is sufficient to showcase the fluid simulation engine capabilities in WebAssembly, i.e running in a web-browser using
+                 client resources. 
+                </p>
+              </div>
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <p>Information on the Fluid Simulation for Games engine, including source code,
+                   is available at <a href="https://software.intel.com/en-us/articles/fluid-simulation-for-video-games-part-3/">https://software.intel.com/en-us/articles/fluid-simulation-for-video-games-part-3/</a>
+                </p>
+              </div>
+              <div class="md-layout-item md-size-85 md-small-size-100">
+                <p>Start the simulation in your web-browser [it is not a video!] by clicking on the arrow below. The page 
+                   will show the visualisation as it happens.
+                </p> 
+                <p align="center"><a href="#" v-on:click="toPlay"><md-icon class="md-size-4x">keyboard_arrow_right</md-icon></a></p>
+              </div>
+            </div>  
+            <md-divider></md-divider>
+            <div class="footer">
+            <a href="/index.html">Building Physics Online</a>
+            Copyright (C) 2019, Dr Julien de Charentenay
+            </div>
+          </div>
+          
+
+          <div v-show="section == PLAY">
+             <canvas id="canvas" width="768" height="512" style="background-color: #eee"></canvas>
+          </div>
+        </md-app-content>
+
+      </md-app>
+        
+    </div>
+
+
+    <script src="/vue/vue.js"></script>
+    <script src="/vue-material/vue-material.js"></script>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!--  script src="/js/httprequest.js"></script>  -->
+
+    <script src="js/vm-webgl.js"></script>
+    
+    <script src="https://www.etiklogs.com/js/simplewebtrafficlogger.js"></script>
+<script type="text/javascript">
+window.onload = function() { SimpleWebTrafficLogger.init({"domainId": "ahhofnNpbXBsZXdlYnRyYWZmaWNsb2dnZXJyHAsSD0RvbWFpbiBEYXRhYmFzZRiAgICA3pCBCgw"}); };
+</script>
+      
+  </body>
+</html>
