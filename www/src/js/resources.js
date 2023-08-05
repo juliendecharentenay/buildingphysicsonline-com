@@ -337,5 +337,18 @@ export const resources =
 			"license": "free",
 			"hashtags": "#solarwall #passiveheating",
 			"version": ""
-		}
+		},
+    {
+			"name": "EPW Map",
+			"key": "ladybug_epwmap",
+			"type": "Web",
+			"url": "https://www.ladybug.tools/epwmap/",
+			"description": "EPW Map is hosted and provided by Ladybug Tools, \"a collection of free omputer applications that support environmental design and education\". EPW Map provides a map to find and download EPW weather files sourced from a wide variety of sources.",
+			"logoUrl": "",
+			"author": "Ladybug Tools",
+			"authorEmail": "",
+			"license": "free",
+			"hashtags": "#epw #ladybug #weatherfiles",
+			"version": ""
+    },
 	];
