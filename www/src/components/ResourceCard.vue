@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="rounded-2xl border border-gray-200">
     <div class="bg-slate-50 rounded-t-2xl pl-4 pt-1 text-gray-800 front-bold text-lg">
       {{ resource.name }}
     </div>
