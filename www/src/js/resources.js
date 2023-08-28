@@ -1,5 +1,18 @@
 export const resources = 
 	[
+    {
+      name: "SoundSurfer",
+      key: "https://soundsurfer.io/",
+      type: "web",
+      url: "https://soundsurfer.io/",
+      description: "SoundSurfer has been created by acoustic consultants for acoustic consultants. It is an acoustic assessment tool to predict the noise from mechanical services systems into occupied spaces or outdoor areas using a simple and intuitive graphic interface.",
+      logoUrl: "",
+      author: "SoundSurfer",
+      authorEmail: "sales@soundsurfer.io",
+      license: "paid (proprietary license)",
+      hashtags: "#acoustic #hvac",
+      version: "",
+    },
 		{
 			"name": "Energy+ Weather Data",
 			"key": "ahdofmJ1aWxkaW5ncGh5c2ljc29ubGluZXIeCxIRUmVzb3VyY2UgRGF0YWJhc2UYgICA4IuSgAoM",
