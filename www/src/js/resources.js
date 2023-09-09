@@ -1,5 +1,46 @@
 export const resources = 
 	[
+    /* 13 lines to copy
+    {
+      name: "",
+      key: "",
+      type: "",
+      url: "",
+      description: "",
+      logoUrl: "",
+      author: "",
+      authorEmail: "",
+      license: "",
+      hashtags: "",
+      version: "",
+    },
+    */
+    {
+      name: "BUILD UP Portal and Newsletter",
+      key: "https://build-up.ec.europa.eu/en/home",
+      type: "web/email",
+      url: "https://build-up.ec.europa.eu/en/home",
+      description: "The European portal for references for building related energy efficiency and renewable. It fosters knownledge related to these topics as collection of resources, tools, etc. A newsletter is issued circa monthly to disseminate news, information and events.",
+      logoUrl: "",
+      author: "European Climate, Infrastructure and Environment Executive Agency",
+      authorEmail: "",
+      license: "free",
+      hashtags: "#buildingperformance #eu #knowledge",
+      version: "",
+    },
+    {
+      name: "Unmet Hours",
+      key: "https://unmethours.com/questions/",
+      type: "web",
+      url: "https://unmethours.com/questions/",
+      description: "A Question-and-Answer resource for the Building Energy Modeling Community. Ask a question to get an answer, respond to someone else question, or just see past questions and answers",
+      logoUrl: "",
+      author: "Big Ladder Software LLC",
+      authorEmail: "unmethours@bigladdersoftware.com",
+      license: "free",
+      hashtags: "#buildingsimulation #knowledge",
+      version: "",
+    },
     {
       name: "SoundSurfer",
       key: "https://soundsurfer.io/",
